@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Ubicaciones</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Gestión de Ubicaciones</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="eventos.html">Eventos</a></li>
+                <li><a href="contactos.html">Contactos</a></li>
+                <li><a href="ubicacion.html">Ubicaciones</a></li>
+               
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>Agregar Nueva Ubicación</h2>
+        <form action="#" method="post">
+            <div>
+                <label for="titulo">Título:</label>
+                <input type="text" id="titulo" name="titulo" placeholder="Ej: Campus Principal" required>
+            </div>
+            
+            <div>
+                <label for="direccion">Dirección:</label>
+                <input type="text" id="direccion" name="direccion" placeholder="Ej: Av. Principal 123" required>
+            </div>
+            
+            <div>
+                <label for="coordenadas">Coordenadas Geográficas (Lat, Lon):</label>
+                <input type="text" id="coordenadas" name="coordenadas" placeholder="Ej: 40.7128, -74.0060" required>
+            </div>
+            
+            <button type="submit">Guardar Ubicación</button>
+        </form>
+        
+        <h2>Ubicaciones Registradas</h2>
+        <ul id="ubicaciones-registrados">
+            <!-- Las ubicaciones se cargan dinámicamente con JavaScript -->
+        </ul>
+    </main>
+    <footer>
+        <p>&copy; 2025 Universidad Tecnológica Equinoccial</p>
+    </footer>
+    <script src="Js/script.js"></script>
+</body>
+</html>

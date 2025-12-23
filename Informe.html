@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe de Gestión</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Estilos específicos para impresión */
+        @media print {
+            header nav, .no-print {
+                display: none !important;
+            }
+            
+            body {
+                background: white !important;
+            }
+            
+            main {
+                box-shadow: none !important;
+                max-width: 100% !important;
+            }
+            
+            .data-section {
+                page-break-inside: avoid;
+            }
+            
+            table {
+                page-break-inside: auto;
+            }
+            
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+            
+            .print-header {
+                display: block !important;
+                text-align: center;
+                margin-bottom: 2rem;
+                border-bottom: 3px solid #2563eb;
+                padding-bottom: 1rem;
+            }
+        }
+        
+        .print-header {
+            display: none;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn-print {
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            padding: 1rem 2rem;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-print:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-export {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        
+        .btn-clear {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+        
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            text-align: center;
+            border-left: 4px solid var(--primary-color);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-card h3 {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .stat-card .number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>📊 Informe de Gestión</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main>
+        <!-- Encabezado para impresión -->
+        <div class="print-header">
+            <h1>📊 Informe de Gestión de Eventos</h1>
+            <p><strong>Universidad Tecnológica Equinoccial</strong></p>
+            <p>Fecha de generación: <span id="print-date"></span></p>
+        </div>
+        
+        <!-- Botones de acción -->
+        <div class="action-buttons no-print">
+            <button class="btn-print" onclick="window.print()">
+                🖨️ Imprimir Informe
+            </button>
+            <button class="btn-print btn-export" onclick="exportData()">
+                📄 Exportar a PDF
+            </button>
+            <button class="btn-print btn-clear" onclick="clearAllData()">
+                🗑️ Limpiar Datos
+            </button>
+        </div>
+        
+        <!-- Estadísticas -->
+        <div class="summary-stats no-print">
+            <div class="stat-card">
+                <h3>Total Eventos</h3>
+                <div class="number" id="total-eventos">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Contactos</h3>
+                <div class="number" id="total-contactos">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Ubicaciones</h3>
+                <div class="number" id="total-ubicaciones">0</div>
+            </div>
+        </div>
+
+        <!-- Sección de Eventos -->
+        <section class="data-section">
+            <h2>📅 Eventos Registrados</h2>
+            <div id="eventos-container">
+                <div class="empty-state">
+                    <p>No hay eventos registrados</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Contactos -->
+        <section class="data-section">
+            <h2>👥 Contactos Registrados</h2>
+            <div id="contactos-container">
+                <div class="empty-state">
+                    <p>No hay contactos registrados</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Ubicaciones -->
+        <section class="data-section">
+            <h2>📍 Ubicaciones Registradas</h2>
+            <div id="ubicaciones-container">
+                <div class="empty-state">
+                    <p>No hay ubicaciones registradas</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <p>&copy; 2025 Universidad Tecnológica Equinoccial</p>
+    </footer>
+    
+    <script src="Js/script.js"></script>
+    <script>
+        // Función para renderizar el resumen de eventos
+        function renderEventosSummary() {
+            const eventos = loadData(STORAGE_KEYS.eventos);
+            const container = document.getElementById('eventos-container');
+            document.getElementById('total-eventos').textContent = eventos.length;
+            
+            if (eventos.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>No hay eventos registrados</p></div>';
+                return;
+            }
+            
+            let html = '<div style="display: grid; gap: 1rem;">';
+            eventos.forEach((evento, index) => {
+                html += `
+                    <div style="background: white; padding: 1.5rem; border-radius: 0.75rem; border-left: 4px solid #2563eb; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                            <h3 style="color: #1e293b; margin: 0; font-size: 1.25rem;">${evento.titulo}</h3>
+                            <span style="background: #3b82f6; color: white; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.875rem; white-space: nowrap;">${evento.clasificacion || 'Evento'}</span>
+                        </div>
+                        <div style="display: grid; gap: 0.5rem; color: #64748b; font-size: 0.95rem;">
+                            <div><strong>📅 Fecha:</strong> ${evento.fecha_hora ? new Date(evento.fecha_hora).toLocaleString('es-EC', {dateStyle: 'full', timeStyle: 'short'}) : '-'}</div>
+                            <div><strong>📍 Lugar:</strong> ${evento.lugar || '-'}</div>
+                            ${evento.descripcion ? `<div><strong>📝 Descripción:</strong> ${evento.descripcion}</div>` : ''}
+                            ${evento.invitados ? `<div><strong>👥 Invitados:</strong> ${evento.invitados}</div>` : ''}
+                        </div>
+                        <button class="action-btn delete-btn no-print" onclick="deleteItem('eventos', ${index})" style="margin-top: 1rem;">Eliminar</button>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+        
+        // Función para renderizar el resumen de contactos
+        function renderContactosSummary() {
+            const contactos = loadData(STORAGE_KEYS.contactos);
+            const container = document.getElementById('contactos-container');
+            document.getElementById('total-contactos').textContent = contactos.length;
+            
+            if (contactos.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>No hay contactos registrados</p></div>';
+                return;
+            }
+            
+            let html = '<div style="display: grid; gap: 1rem;">';
+            contactos.forEach((contacto, index) => {
+                html += `
+                    <div style="background: white; padding: 1.5rem; border-radius: 0.75rem; border-left: 4px solid #10b981; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <h3 style="color: #1e293b; margin: 0 0 1rem 0; font-size: 1.25rem;">${contacto.nombre}</h3>
+                        <div style="display: grid; gap: 0.5rem; color: #64748b; font-size: 0.95rem;">
+                            <div><strong>🆔 Cédula:</strong> ${contacto.id || '-'}</div>
+                            <div><strong>💼 Profesión:</strong> ${contacto.profesion || '-'}</div>
+                            <div><strong>📧 Email:</strong> <a href="mailto:${contacto.email}" style="color: #2563eb;">${contacto.email || '-'}</a></div>
+                            <div><strong>📱 Teléfono:</strong> <a href="tel:${contacto.telefono}" style="color: #2563eb;">${contacto.telefono || '-'}</a></div>
+                        </div>
+                        <button class="action-btn delete-btn no-print" onclick="deleteItem('contactos', ${index})" style="margin-top: 1rem;">Eliminar</button>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+        
+        // Función para renderizar el resumen de ubicaciones
+        function renderUbicacionesSummary() {
+            const ubicaciones = loadData(STORAGE_KEYS.ubicaciones);
+            const container = document.getElementById('ubicaciones-container');
+            document.getElementById('total-ubicaciones').textContent = ubicaciones.length;
+            
+            if (ubicaciones.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>No hay ubicaciones registradas</p></div>';
+                return;
+            }
+            
+            let html = '<div style="display: grid; gap: 1rem;">';
+            ubicaciones.forEach((ubicacion, index) => {
+                html += `
+                    <div style="background: white; padding: 1.5rem; border-radius: 0.75rem; border-left: 4px solid #f59e0b; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <h3 style="color: #1e293b; margin: 0 0 1rem 0; font-size: 1.25rem;">${ubicacion.titulo}</h3>
+                        <div style="display: grid; gap: 0.5rem; color: #64748b; font-size: 0.95rem;">
+                            <div><strong>📍 Dirección:</strong> ${ubicacion.direccion || '-'}</div>
+                            <div><strong>🗺️ Coordenadas:</strong> <code style="background: #f1f5f9; padding: 0.25rem 0.5rem; border-radius: 0.25rem;">${ubicacion.coordenadas || '-'}</code></div>
+                        </div>
+                        <button class="action-btn delete-btn no-print" onclick="deleteItem('ubicaciones', ${index})" style="margin-top: 1rem;">Eliminar</button>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+        
+        // Función para exportar a PDF (simulada con impresión)
+        function exportData() {
+            showAlert('Usa Ctrl+P o Cmd+P y selecciona "Guardar como PDF" en el destino', 'info');
+            setTimeout(() => window.print(), 500);
+        }
+        
+        // Actualizar la fecha de impresión
+        document.getElementById('print-date').textContent = new Date().toLocaleDateString('es-EC', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        // Cargar todos los resúmenes al cargar la página
+        document.addEventListener('DOMContentLoaded', () => {
+            renderEventosSummary();
+            renderContactosSummary();
+            renderUbicacionesSummary();
+        });
+        
+        // Actualizar la función deleteItem para refrescar las vistas
+        const originalDeleteItem = window.deleteItem;
+        window.deleteItem = function(type, index) {
+            originalDeleteItem(type, index);
+            renderEventosSummary();
+            renderContactosSummary();
+            renderUbicacionesSummary();
+        };
+    </script>
+</body>
+</html>

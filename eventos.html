@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Eventos</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Gestión de Eventos</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="eventos.html">Eventos</a></li>
+                <li><a href="contactos.html">Contactos</a></li>
+                <li><a href="ubicacion.html">Ubicaciones</a></li>
+                
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>Agregar Nuevo Evento</h2>
+        <form action="#" method="post">
+            <div>
+                <label for="titulo">Nombre del evento:</label>
+                <input type="text" id="titulo" name="titulo" required>
+            </div>
+            
+            <div>
+                <label for="invitados">Invitados:</label>
+                <textarea id="invitados" name="invitados" placeholder="Lista de invitados"></textarea>
+            </div>
+            
+            <div>
+                <label for="fecha_hora">Fecha y Hora:</label>
+                <input type="datetime-local" id="fecha_hora" name="fecha_hora" required>
+            </div>
+            
+            <div>
+                <label for="zona_horaria">Zona Horaria:</label>
+                <input type="text" id="zona_horaria" name="zona_horaria" value="America/Guayaquil" required>
+            </div>
+            
+            <div>
+                <label for="descripcion">Descripción:</label>
+                <textarea id="descripcion" name="descripcion" placeholder="Describe el evento"></textarea>
+            </div>
+            
+            <div>
+                <label for="repeticion">Repetición:</label>
+                <select id="repeticion" name="repeticion">
+                    <option value="ninguna">Ninguna</option>
+                    <option value="diaria">Diaria</option>
+                    <option value="semanal">Semanal</option>
+                    <option value="mensual">Mensual</option>
+                </select>
+            </div>
+            
+            <div>
+                <label for="recordatorio">Recordatorio:</label>
+                <input type="text" id="recordatorio" name="recordatorio" placeholder="Ej: 30 minutos antes">
+            </div>
+            
+            <div>
+                <label for="clasificacion">Tipo de evento:</label>
+                <select id="clasificacion" name="clasificacion">
+                    <option value="conferencia">Conferencia</option>
+                    <option value="taller">Taller</option>
+                    <option value="seminario">Seminario</option>
+                    <option value="reunion">Reunión</option>
+                    <option value="otro">Otro</option>
+                </select>
+            </div>
+            
+            <div>
+                <label for="lugar">Lugar:</label>
+                <input type="text" id="lugar" name="lugar" placeholder="Ubicación del evento" required>
+            </div>
+            
+            <button type="submit">Guardar Evento</button>
+        </form>
+        
+        <h2>Eventos Registrados</h2>
+        <ul id="eventos-registrados">
+            <!-- Los eventos se cargan dinámicamente con JavaScript -->
+        </ul>
+    </main>
+    <footer>
+        <p>&copy; 2025 Universidad Tecnológica Equinoccial</p>
+    </footer>
+    <script src="Js/script.js"></script>
+</body>
+</html>
