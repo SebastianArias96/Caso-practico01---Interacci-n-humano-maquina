@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Contactos</title>
+    <title>Gestión de Contactos - UTE</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -15,49 +15,114 @@
                 <li><a href="eventos.html">Eventos</a></li>
                 <li><a href="contactos.html">Contactos</a></li>
                 <li><a href="ubicacion.html">Ubicaciones</a></li>
-                
             </ul>
         </nav>
     </header>
     <main>
         <h2>Agregar Nuevo Contacto</h2>
-        <form action="#" method="post">
+        <form id="form-contactos">
             <div>
                 <label for="nombre">Nombres y Apellidos:</label>
-                <input type="text" id="nombre" name="nombre" placeholder="Ej: Dr. Juan Pérez" required>
+                <input type="text" id="nombre" placeholder="Ej: Dr. Juan Pérez" required>
             </div>
             
             <div>
-                <label for="id">Cédula de Identidad:</label>
-                <input type="text" id="id" name="id" placeholder="Ej: 1234567890" required>
+                <label for="cedula">Cédula de Identidad:</label>
+                <input type="text" id="cedula" placeholder="Ej: 1234567890" required>
             </div>
 
             <div>
                 <label for="profesion">Profesión:</label>
-                <input type="text" id="profesion" name="profesion" placeholder="Ej: Ingeniero, Docente" required>
+                <input type="text" id="profesion" placeholder="Ej: Ingeniero, Docente" required>
             </div>
             
             <div>
                 <label for="email">Correo Electrónico:</label>
-                <input type="email" id="email" name="email" placeholder="ejemplo@correo.com" required>
+                <input type="email" id="email" placeholder="ejemplo@ute.edu.ec" required>
             </div>
             
             <div>
                 <label for="telefono">Número de Teléfono:</label>
-                <input type="tel" id="telefono" name="telefono" placeholder="0999999999" required>
+                <input type="tel" id="telefono" placeholder="0999999999" required>
             </div>
             
-            <button type="submit">Guardar Contacto</button>
+            <button type="submit">Guardar Contacto en Firebase</button>
         </form>
         
-        <h2>Contactos Registrados</h2>
-        <ul id="contactos-registrados">
-            <!-- Los contactos se cargan dinámicamente con JavaScript -->
-        </ul>
+        <hr>
+        
+        <h2>Contactos Registrados (Nube)</h2>
+        <ul id="lista-contactos">
+            </ul>
     </main>
     <footer>
         <p>&copy; 2025 Universidad Tecnológica Equinoccial</p>
     </footer>
-    <script src="Js/script.js"></script>
+
+    <script type="module">
+        import { initializeApp } from "firebase/app";
+        import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "firebase/firestore";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxKQWalmHfLxhbYGru_hzvfuVCUJuHuzw",
+            authDomain: "caso-practico-c631b.firebaseapp.com",
+            projectId: "caso-practico-c631b",
+            storageBucket: "caso-practico-c631b.firebasestorage.app",
+            messagingSenderId: "233285378258",
+            appId: "1:233285378258:web:8abcd2c3ae504e17da8d0b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const form = document.getElementById('form-contactos');
+        const listaUl = document.getElementById('lista-contactos');
+
+        // 1. Guardar Contacto
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const nuevoContacto = {
+                nombre: document.getElementById('nombre').value,
+                cedula: document.getElementById('cedula').value,
+                profesion: document.getElementById('profesion').value,
+                email: document.getElementById('email').value,
+                telefono: document.getElementById('telefono').value,
+                fecha_registro: serverTimestamp()
+            };
+
+            try {
+                await addDoc(collection(db, "contactos"), nuevoContacto);
+                alert("👤 Contacto guardado correctamente en la nube.");
+                form.reset();
+                cargarContactos();
+            } catch (error) {
+                console.error("Error al guardar contacto:", error);
+                alert("Error al conectar con la base de datos.");
+            }
+        });
+
+        // 2. Leer Contactos
+        async function cargarContactos() {
+            listaUl.innerHTML = "Cargando lista...";
+            const querySnapshot = await getDocs(collection(db, "contactos"));
+            listaUl.innerHTML = "";
+            
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                const li = document.createElement('li');
+                li.style.padding = "10px";
+                li.style.borderBottom = "1px solid #eee";
+                li.innerHTML = `
+                    <strong>${data.nombre}</strong> (${data.profesion})<br>
+                    📧 ${data.email} | 📞 ${data.telefono}
+                `;
+                listaUl.appendChild(li);
+            });
+        }
+
+        // Cargar al iniciar
+        cargarContactos();
+    </script>
 </body>
 </html>
