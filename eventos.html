@@ -26,103 +26,63 @@
                 <label for="titulo">Nombre del evento:</label>
                 <input type="text" id="titulo" required>
             </div>
-            
-            <div>
-                <label for="invitados">Invitados:</label>
-                <textarea id="invitados" placeholder="Lista de invitados"></textarea>
-            </div>
-            
             <div>
                 <label for="fecha_hora">Fecha y Hora:</label>
                 <input type="datetime-local" id="fecha_hora" required>
             </div>
-            
             <div>
                 <label for="lugar">Lugar:</label>
-                <input type="text" id="lugar" placeholder="Ubicación del evento" required>
+                <input type="text" id="lugar" required>
             </div>
-            
-            <button type="submit">Guardar Evento en Firebase</button>
+            <button type="submit">Guardar en Firebase</button>
         </form>
         
         <hr>
-        
-        <h2>Eventos Registrados (Nube)</h2>
-        <ul id="eventos-registrados">
-            </ul>
+        <h2>Eventos en la Nube</h2>
+        <ul id="lista-eventos"></ul>
     </main>
 
-    <footer>
-        <p>&copy; 2025 Universidad Tecnológica Equinoccial</p>
-    </footer>
-
     <script type="module">
-        import { initializeApp } from "firebase/app";
-        import { getFirestore, collection, addDoc, getDocs, serverTimestamp, query, orderBy } from "firebase/firestore";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-firestore.js";
 
-        // Tu configuración real
         const firebaseConfig = {
             apiKey: "AIzaSyDxKQWalmHfLxhbYGru_hzvfuVCUJuHuzw",
             authDomain: "caso-practico-c631b.firebaseapp.com",
             projectId: "caso-practico-c631b",
             storageBucket: "caso-practico-c631b.firebasestorage.app",
             messagingSenderId: "233285378258",
-            appId: "1:233285378258:web:8abcd2c3ae504e17da8d0b",
-            measurementId: "G-NDYQDSYH14"
+            appId: "1:233285378258:web:8abcd2c3ae504e17da8d0b"
         };
 
-        // Inicializar Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        const form = document.getElementById('form-eventos');
-        const listaUl = document.getElementById('eventos-registrados');
-
-        // Función para GUARDAR
-        form.addEventListener('submit', async (e) => {
+        // Guardar
+        document.getElementById('form-eventos').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            const nuevoEvento = {
-                titulo: document.getElementById('titulo').value,
-                invitados: document.getElementById('invitados').value,
-                fecha_hora: document.getElementById('fecha_hora').value,
-                lugar: document.getElementById('lugar').value,
-                createdAt: serverTimestamp()
-            };
-
             try {
-                await addDoc(collection(db, "eventos"), nuevoEvento);
-                alert("✅ Evento guardado en Firestore");
-                form.reset();
-                cargarEventos(); // Actualizar lista
+                await addDoc(collection(db, "eventos"), {
+                    titulo: document.getElementById('titulo').value,
+                    fecha_hora: document.getElementById('fecha_hora').value,
+                    lugar: document.getElementById('lugar').value,
+                    createdAt: serverTimestamp()
+                });
+                alert("¡Guardado!");
+                location.reload();
             } catch (error) {
-                console.error("Error:", error);
-                alert("Error al guardar.");
+                alert("Error: " + error.message);
             }
         });
 
-        // Función para LEER
-        async function cargarEventos() {
-            listaUl.innerHTML = "Cargando...";
-            try {
-                const q = query(collection(db, "eventos"), orderBy("createdAt", "desc"));
-                const querySnapshot = await getDocs(q);
-                listaUl.innerHTML = "";
-                
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const li = document.createElement('li');
-                    li.style.borderBottom = "1px solid #ccc";
-                    li.style.padding = "10px";
-                    li.innerHTML = <strong>${data.titulo}</strong><br>📅 ${data.fecha_hora} | 📍 ${data.lugar};
-                    listaUl.appendChild(li);
-                });
-            } catch (e) {
-                console.error(e);
-            }
-        }
-
-        cargarEventos();
+        // Leer
+        const lista = document.getElementById('lista-eventos');
+        const q = query(collection(db, "eventos"), orderBy("createdAt", "desc"));
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+            const item = doc.data();
+            lista.innerHTML += <li><strong>${item.titulo}</strong> - ${item.lugar}</li>;
+        });
     </script>
 </body>
 </html>
