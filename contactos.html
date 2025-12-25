@@ -18,6 +18,7 @@
             </ul>
         </nav>
     </header>
+
     <main>
         <h2>Agregar Nuevo Contacto</h2>
         <form id="form-contactos">
@@ -28,12 +29,12 @@
             
             <div>
                 <label for="cedula">Cédula de Identidad:</label>
-                <input type="text" id="cedula" placeholder="Ej: 1234567890" required>
+                <input type="text" id="cedula" placeholder="Ej: 1712345678" required>
             </div>
 
             <div>
                 <label for="profesion">Profesión:</label>
-                <input type="text" id="profesion" placeholder="Ej: Ingeniero, Docente" required>
+                <input type="text" id="profesion" placeholder="Ej: Ingeniero" required>
             </div>
             
             <div>
@@ -42,26 +43,21 @@
             </div>
             
             <div>
-                <label for="telefono">Número de Teléfono:</label>
+                <label for="telefono">Teléfono:</label>
                 <input type="tel" id="telefono" placeholder="0999999999" required>
             </div>
             
-            <button type="submit">Guardar Contacto en Firebase</button>
+            <button type="submit">Guardar en Firebase</button>
         </form>
         
         <hr>
-        
-        <h2>Contactos Registrados (Nube)</h2>
-        <ul id="lista-contactos">
-            </ul>
+        <h2>Contactos en la Nube</h2>
+        <ul id="lista-contactos"></ul>
     </main>
-    <footer>
-        <p>&copy; 2025 Universidad Tecnológica Equinoccial</p>
-    </footer>
 
     <script type="module">
-        import { initializeApp } from "firebase/app";
-        import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "firebase/firestore";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDxKQWalmHfLxhbYGru_hzvfuVCUJuHuzw",
@@ -75,54 +71,44 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        const form = document.getElementById('form-contactos');
-        const listaUl = document.getElementById('lista-contactos');
-
-        // 1. Guardar Contacto
-        form.addEventListener('submit', async (e) => {
+        // --- GUARDAR CONTACTO ---
+        document.getElementById('form-contactos').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            const nuevoContacto = {
-                nombre: document.getElementById('nombre').value,
-                cedula: document.getElementById('cedula').value,
-                profesion: document.getElementById('profesion').value,
-                email: document.getElementById('email').value,
-                telefono: document.getElementById('telefono').value,
-                fecha_registro: serverTimestamp()
-            };
-
             try {
-                await addDoc(collection(db, "contactos"), nuevoContacto);
-                alert("👤 Contacto guardado correctamente en la nube.");
-                form.reset();
-                cargarContactos();
+                await addDoc(collection(db, "contactos"), {
+                    nombre: document.getElementById('nombre').value,
+                    cedula: document.getElementById('cedula').value,
+                    profesion: document.getElementById('profesion').value,
+                    email: document.getElementById('email').value,
+                    telefono: document.getElementById('telefono').value,
+                    createdAt: serverTimestamp()
+                });
+                alert("¡Contacto Guardado!");
+                location.reload();
             } catch (error) {
-                console.error("Error al guardar contacto:", error);
-                alert("Error al conectar con la base de datos.");
+                alert("Error: " + error.message);
             }
         });
 
-        // 2. Leer Contactos
-        async function cargarContactos() {
-            listaUl.innerHTML = "Cargando lista...";
-            const querySnapshot = await getDocs(collection(db, "contactos"));
-            listaUl.innerHTML = "";
+        // --- LEER CONTACTOS ---
+        const lista = document.getElementById('lista-contactos');
+        try {
+            const q = query(collection(db, "contactos"), orderBy("createdAt", "desc"));
+            const querySnapshot = await getDocs(q);
             
             querySnapshot.forEach((doc) => {
-                const data = doc.data();
+                const item = doc.data();
                 const li = document.createElement('li');
-                li.style.padding = "10px";
-                li.style.borderBottom = "1px solid #eee";
+                li.style.marginBottom = "10px";
                 li.innerHTML = `
-                    <strong>${data.nombre}</strong> (${data.profesion})<br>
-                    📧 ${data.email} | 📞 ${data.telefono}
+                    <strong>${item.nombre}</strong> - ${item.profesion}<br>
+                    <small>📧 ${item.email} | 📞 ${item.telefono}</small>
                 `;
-                listaUl.appendChild(li);
+                lista.appendChild(li);
             });
+        } catch (error) {
+            console.error("Error al leer contactos: ", error);
         }
-
-        // Cargar al iniciar
-        cargarContactos();
     </script>
 </body>
 </html>
