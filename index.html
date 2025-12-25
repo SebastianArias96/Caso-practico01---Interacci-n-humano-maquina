@@ -9,10 +9,10 @@
 <body>
     <header>
         <h1>Gestor de Eventos UTE</h1>
-        <main>
+        <div style="padding: 1rem; background-color: rgba(255,255,255,0.1);">
             <h2>Bienvenido al Sistema de Gestión de Eventos de la UTE</h2>
             <p>Seleccione la operación que desee registrar.</p>
-        </main>
+        </div>
         
         <nav>
             <ul>
@@ -28,13 +28,15 @@
         <section style="text-align: center; padding: 2rem 0;">
             <h2 style="margin-bottom: 1.5rem; font-size: 1.4rem;">¿Deseas ver el informe de hoy?</h2>
             
-            <a href="Informe.html" style="text-decoration: none;">
-                <div id="card-informe" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; padding: 0.75rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: pointer; max-width: 300px; margin: 0 auto;">
-                    <div style="font-size: 1.5rem; margin-bottom: 0.4rem;">📊</div>
-                    <h3 style="margin-bottom: 0.2rem; font-size: 1rem;">Informe</h3>
-                    <p style="opacity: 0.9; font-size: 0.75rem;">Imprime resumen</p>
-                </div>
-            </a>
+            <div style="display: flex; justify-content: center;">
+                <a href="informe.html" style="text-decoration: none; width: 250px;">
+                    <div id="card-informe" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; padding: 1.5rem; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); transition: all 0.3s ease; cursor: pointer;">
+                        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📊</div>
+                        <h3 style="margin-bottom: 0.5rem; font-size: 1.2rem;">Ver Informe</h3>
+                        <p style="opacity: 0.9; font-size: 0.85rem;">Resumen total de registros</p>
+                    </div>
+                </a>
+            </div>
         </section>
     </main>
     
@@ -42,27 +44,25 @@
         <p>&copy; 2025 Universidad Tecnológica Equinoccial</p>
     </footer>
     
-    <script src="Js/script.js"></script>
     <script>
-        // Efecto hover para la tarjeta de informe
         const card = document.getElementById('card-informe');
+        
         card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-8px)';
-            this.style.boxShadow = '0 16px 20px -5px rgba(0, 0, 0, 0.2)';
+            this.style.transform = 'translateY(-10px)';
+            this.style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.2)';
         });
         
         card.addEventListener('mouseleave', function() {
             this.style.transform = 'translateY(0)';
-            this.style.boxShadow = '0 8px 10px -3px rgba(0, 0, 0, 0.1)';
+            this.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
         });
     </script>
 
     <script type="module">
-        import { initializeApp } from "firebase/app";
-        import { getAnalytics } from "firebase/analytics";
-        import { getFirestore } from "firebase/firestore"; // Importamos el servicio de base de datos
+        // Importación corregida usando CDN
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-analytics.js";
 
-        // Configuración de tu aplicación
         const firebaseConfig = {
             apiKey: "AIzaSyDxKQWalmHfLxhbYGru_hzvfuVCUJuHuzw",
             authDomain: "caso-practico-c631b.firebaseapp.com",
@@ -76,14 +76,6 @@
         // Inicializar Firebase
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
-        
-        // Inicializar Firestore (Base de datos)
-        const db = getFirestore(app);
-
-        // Exportar 'db' al objeto global window para que Js/script.js pueda usarlo
-        window.db = db;
-
-        console.log("🔥 Firebase y Firestore conectados correctamente en Index");
     </script>
 </body>
 </html>
