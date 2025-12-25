@@ -42,13 +42,13 @@
                 <input type="text" id="lugar" placeholder="Ubicación del evento" required>
             </div>
             
-            <button type="submit">Guardar Evento en la Nube</button>
+            <button type="submit">Guardar Evento en Firebase</button>
         </form>
         
         <hr>
         
-        <h2>Eventos Registrados (Desde Firebase)</h2>
-        <ul id="lista-eventos">
+        <h2>Eventos Registrados (Nube)</h2>
+        <ul id="eventos-registrados">
             </ul>
     </main>
 
@@ -73,9 +73,9 @@
         const db = getFirestore(app);
 
         const form = document.getElementById('form-eventos');
-        const listaUl = document.getElementById('lista-eventos');
+        const listaEventos = document.getElementById('eventos-registrados');
 
-        // 1. Función para GUARDAR datos
+        // Función para guardar en Firestore
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -84,37 +84,34 @@
                 invitados: document.getElementById('invitados').value,
                 fecha_hora: document.getElementById('fecha_hora').value,
                 lugar: document.getElementById('lugar').value,
-                fecha_creacion: serverTimestamp() 
+                timestamp: serverTimestamp()
             };
 
             try {
                 await addDoc(collection(db, "eventos"), nuevoEvento);
-                alert("¡Evento guardado exitosamente!");
+                alert("✅ Evento guardado con éxito en la nube");
                 form.reset();
-                cargarEventos(); // Refrescar lista
+                cargarEventos();
             } catch (error) {
                 console.error("Error al guardar:", error);
-                alert("Hubo un error al conectar con Firebase.");
+                alert("Error al conectar con Firebase");
             }
         });
 
-        // 2. Función para LEER datos
+        // Función para leer de Firestore
         async function cargarEventos() {
-            listaUl.innerHTML = "Cargando eventos...";
+            listaEventos.innerHTML = "Cargando...";
             const querySnapshot = await getDocs(collection(db, "eventos"));
-            listaUl.innerHTML = ""; 
+            listaEventos.innerHTML = "";
             
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
                 const li = document.createElement('li');
-                li.style.padding = "10px";
-                li.style.borderBottom = "1px solid #ddd";
-                li.innerHTML = <strong>${data.titulo}</strong><br>📅 ${data.fecha_hora} | 📍 ${data.lugar};
-                listaUl.appendChild(li);
+                li.innerHTML = <strong>${data.titulo}</strong> - 📅 ${data.fecha_hora} - 📍 ${data.lugar};
+                listaEventos.appendChild(li);
             });
         }
 
-        // Cargar datos al abrir la página
         cargarEventos();
     </script>
 </body>
