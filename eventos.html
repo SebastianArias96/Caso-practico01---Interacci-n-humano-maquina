@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Eventos</title>
+    <title>Gestión de Eventos - UTE</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -15,80 +15,107 @@
                 <li><a href="eventos.html">Eventos</a></li>
                 <li><a href="contactos.html">Contactos</a></li>
                 <li><a href="ubicacion.html">Ubicaciones</a></li>
-                
             </ul>
         </nav>
     </header>
+
     <main>
         <h2>Agregar Nuevo Evento</h2>
-        <form action="#" method="post">
+        <form id="form-eventos">
             <div>
                 <label for="titulo">Nombre del evento:</label>
-                <input type="text" id="titulo" name="titulo" required>
+                <input type="text" id="titulo" required>
             </div>
             
             <div>
                 <label for="invitados">Invitados:</label>
-                <textarea id="invitados" name="invitados" placeholder="Lista de invitados"></textarea>
+                <textarea id="invitados" placeholder="Lista de invitados"></textarea>
             </div>
             
             <div>
                 <label for="fecha_hora">Fecha y Hora:</label>
-                <input type="datetime-local" id="fecha_hora" name="fecha_hora" required>
-            </div>
-            
-            <div>
-                <label for="zona_horaria">Zona Horaria:</label>
-                <input type="text" id="zona_horaria" name="zona_horaria" value="America/Guayaquil" required>
-            </div>
-            
-            <div>
-                <label for="descripcion">Descripción:</label>
-                <textarea id="descripcion" name="descripcion" placeholder="Describe el evento"></textarea>
-            </div>
-            
-            <div>
-                <label for="repeticion">Repetición:</label>
-                <select id="repeticion" name="repeticion">
-                    <option value="ninguna">Ninguna</option>
-                    <option value="diaria">Diaria</option>
-                    <option value="semanal">Semanal</option>
-                    <option value="mensual">Mensual</option>
-                </select>
-            </div>
-            
-            <div>
-                <label for="recordatorio">Recordatorio:</label>
-                <input type="text" id="recordatorio" name="recordatorio" placeholder="Ej: 30 minutos antes">
-            </div>
-            
-            <div>
-                <label for="clasificacion">Tipo de evento:</label>
-                <select id="clasificacion" name="clasificacion">
-                    <option value="conferencia">Conferencia</option>
-                    <option value="taller">Taller</option>
-                    <option value="seminario">Seminario</option>
-                    <option value="reunion">Reunión</option>
-                    <option value="otro">Otro</option>
-                </select>
+                <input type="datetime-local" id="fecha_hora" required>
             </div>
             
             <div>
                 <label for="lugar">Lugar:</label>
-                <input type="text" id="lugar" name="lugar" placeholder="Ubicación del evento" required>
+                <input type="text" id="lugar" placeholder="Ubicación del evento" required>
             </div>
             
-            <button type="submit">Guardar Evento</button>
+            <button type="submit">Guardar Evento en la Nube</button>
         </form>
         
-        <h2>Eventos Registrados</h2>
-        <ul id="eventos-registrados">
-            <!-- Los eventos se cargan dinámicamente con JavaScript -->
-        </ul>
+        <hr>
+        
+        <h2>Eventos Registrados (Desde Firebase)</h2>
+        <ul id="lista-eventos">
+            </ul>
     </main>
+
     <footer>
         <p>&copy; 2025 Universidad Tecnológica Equinoccial</p>
     </footer>
-    <script src="Js/script.js"></script>
+
+    <script type="module">
+        import { initializeApp } from "firebase/app";
+        import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "firebase/firestore";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxKQWalmHfLxhbYGru_hzvfuVCUJuHuzw",
+            authDomain: "caso-practico-c631b.firebaseapp.com",
+            projectId: "caso-practico-c631b",
+            storageBucket: "caso-practico-c631b.firebasestorage.app",
+            messagingSenderId: "233285378258",
+            appId: "1:233285378258:web:8abcd2c3ae504e17da8d0b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const form = document.getElementById('form-eventos');
+        const listaUl = document.getElementById('lista-eventos');
+
+        // 1. Función para GUARDAR datos
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const nuevoEvento = {
+                titulo: document.getElementById('titulo').value,
+                invitados: document.getElementById('invitados').value,
+                fecha_hora: document.getElementById('fecha_hora').value,
+                lugar: document.getElementById('lugar').value,
+                fecha_creacion: serverTimestamp() 
+            };
+
+            try {
+                await addDoc(collection(db, "eventos"), nuevoEvento);
+                alert("¡Evento guardado exitosamente!");
+                form.reset();
+                cargarEventos(); // Refrescar lista
+            } catch (error) {
+                console.error("Error al guardar:", error);
+                alert("Hubo un error al conectar con Firebase.");
+            }
+        });
+
+        // 2. Función para LEER datos
+        async function cargarEventos() {
+            listaUl.innerHTML = "Cargando eventos...";
+            const querySnapshot = await getDocs(collection(db, "eventos"));
+            listaUl.innerHTML = ""; 
+            
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                const li = document.createElement('li');
+                li.style.padding = "10px";
+                li.style.borderBottom = "1px solid #ddd";
+                li.innerHTML = <strong>${data.titulo}</strong><br>📅 ${data.fecha_hora} | 📍 ${data.lugar};
+                listaUl.appendChild(li);
+            });
+        }
+
+        // Cargar datos al abrir la página
+        cargarEventos();
+    </script>
 </body>
 </html>
